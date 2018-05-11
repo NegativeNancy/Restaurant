@@ -24,6 +24,10 @@ public class MenuActivity extends AppCompatActivity implements MenuItemsRequest.
         Intent intent = getIntent();
         String category = intent.getStringExtra("clickedCategory");
 
+        // Set title bar tot category.
+        String title =  category.substring(0,1).toUpperCase() + category.substring(1);
+        setTitle(title);
+
         // create new request for specified category
         MenuItemsRequest request = new MenuItemsRequest(this, category);
         request.getMenuItems(this);

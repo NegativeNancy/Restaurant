@@ -41,6 +41,11 @@ public class MenuItemActivity extends AppCompatActivity {
                 menuItem.getPrice();
         itemPrice.setText(price);
 
+        // Set title bar tot category.
+        String category = menuItem.getCategory();
+        String title =  category.substring(0,1).toUpperCase() + category.substring(1);
+        setTitle(title);
+
         // Create URL and load image in ImageView with Picasso library.
         String url = menuItem.getImageUrl();
         Picasso.get().load(url).into(itemImage, new Callback() {
