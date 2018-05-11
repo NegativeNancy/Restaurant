@@ -61,7 +61,7 @@ public class MenuItemActivity extends AppCompatActivity {
     }
 
     /* Finish the activity when button is pressed. */
-    public void closeClicked() {
+    public void closeClicked(View view) {
         finishAfterTransition();
     }
 }
