@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">Restaurant</string>
+    <string name="placeholder">placeholder</string>
+    <string name="currency">€ </string>
+    <string name="back_button">Back button</string>
+    <string name="image_desc">Image of item</string>
 </resources>

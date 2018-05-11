@@ -6,28 +6,29 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
 
-/* Main view with the food categories that the restaurant uses. */
-public class CategoriesActivity extends AppCompatActivity implements CategoriesRequest.Callback {
+/* Activity that displays al the items in the specific category */
+public class MenuActivity extends AppCompatActivity implements MenuItemsRequest.Callback {
 
-    private ListView listView;
-
+    /* Create activity and fill the ListView. */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_categories);
+        setContentView(R.layout.activity_menu);
 
-        // Make request to get the categories.
-        CategoriesRequest request = new CategoriesRequest(getApplicationContext());
-        request.getCategories(this);
+        // get category that is clicked
+        Intent intent = getIntent();
+        String category = intent.getStringExtra("clickedCategory");
 
-        // Create onClick listener for categories
-        listView = findViewById(R.id.mainList);
+        // create new request for specified category
+        MenuItemsRequest request = new MenuItemsRequest(this, category);
+        request.getMenuItems(this);
+
+        ListView listView = findViewById(R.id.menuList);
         itemClicked listener = new itemClicked();
         listView.setOnItemClickListener(listener);
     }
@@ -36,8 +37,8 @@ public class CategoriesActivity extends AppCompatActivity implements CategoriesR
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        listView = findViewById(R.id.mainList);
-        int scrollPosition = listView.getLastVisiblePosition();
+        ListView listView = findViewById(R.id.menuList);
+        int scrollPosition = listView.getFirstVisiblePosition();
         outState.putInt("scroll_position",  scrollPosition);
     }
 
@@ -45,38 +46,37 @@ public class CategoriesActivity extends AppCompatActivity implements CategoriesR
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
-        listView = findViewById(R.id.mainList);
+        ListView listView = findViewById(R.id.menuList);
         final int savedPosition = savedInstanceState.getInt("scroll_position");
         listView.smoothScrollToPosition(savedPosition);
     }
 
     /* Use adapter to fill the list. */
     @Override
-    public void gotCategories(ArrayList<String> categories) {
-        ArrayAdapter<String> categoriesAdapter = new ArrayAdapter<>(this,
-                R.layout.categorie_row, R.id.categoryTitle, categories);
-        ListView listView = findViewById(R.id.mainList);
-        listView.setAdapter(categoriesAdapter);
+    public void gotMenuItems(ArrayList<MenuItem> menuItems) {
+        MenuAdapter menuAdapter = new MenuAdapter(this, menuItems);
+        ListView listView = findViewById(R.id.menuList);
+        listView.setAdapter(menuAdapter);
     }
 
-    /* Display error message when error occurs. */
+    /* Display error in an Toast. */
     @Override
-    public void gotCategoriesError(String message) {
+    public void gotMenuItemsError(String message) {
         Toast.makeText(this, message, Toast.LENGTH_LONG).show();
     }
 
-    /* Implements OnItemClickListener for categories. */
+    /* Implements OnItemClickListener for the menu items. */
     private class itemClicked implements AdapterView.OnItemClickListener {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-            String clickedCategory = (String) parent.getItemAtPosition(position);
+            MenuItem menuItem = (MenuItem) parent.getItemAtPosition(position);
 
-            Intent menuActivity = new Intent(CategoriesActivity.this, MenuActivity.class);
-            menuActivity.putExtra("clickedCategory", clickedCategory);
+            Intent menuItemActivity = new Intent(MenuActivity.this, MenuItemActivity.class);
+            menuItemActivity.putExtra("menuItemClicked", menuItem);
 
             // Create Parent-to-child transition as specified by Material Design
             Bundle options = ActivityOptionsCompat.makeScaleUpAnimation(view, 0,0, view.getWidth(), view.getHeight()).toBundle();
-            startActivity(menuActivity, options);
+            startActivity(menuItemActivity, options);
         }
     }
 }
